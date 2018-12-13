@@ -1,59 +1,54 @@
 const User = require('../models/User');
 const Book = require('../models/User');
-module.exports = (app) => {
 
-
-    /**
-     * See all of a users tagged books available to everyone
-     */
-    app.get("/api/books/tagged/:userid", (req, res) => {
-        User.findById({ _id: req.param.userid }, (err, user) => {
-            if (err) {
-                console.log(err);
-                return res.redirect('/');
-            }
-            let books = []
-            for (index in user.tagged_books) {
-                Book.findById({ _id: index }, (err, book) => {
-                    if (err) {
-                        console.log(err);
-                    }
-                    books.push(book);
-                });
-            };
-            let books = books.map((x) => {
-                if (x.private == false) {
-                    return x;
-                }
-            });
-            res.json(books.json())
+module.exports = app => {
+  /**
+   * See all of a users tagged books available to everyone
+   */
+  app.get('/api/books/tagged/:userid', (req, res) => {
+    User.findById({ _id: req.param.userid }, (err, user) => {
+      if (err) {
+        console.log(err);
+        return res.redirect('/');
+      }
+      let books = [];
+      for (index in user.tagged_books) {
+        Book.findById({ _id: index }, (err, book) => {
+          if (err) {
+            console.log(err);
+          }
+          books.push(book);
         });
+      }
+      books = books.map(x => {
+        if (x.private == false) {
+          return x;
+        }
+      });
+      res.json(books.json());
     });
+  });
 
-    /**
-     * Limited to owner of the account includes private books
-     */
+  /**
+   * Limited to owner of the account includes private books
+   */
 
-    app.get("/api/books/closed/tagged/:userid", (req, res) => {
-        User.findById({ _id: req.param.userid }, (err, user) => {
-            if (err) {
-                console.log(err);
-                res.redirect('/');
-            }
-            let books = []
-            for (index in user.tagged_books) {
-                Book.findById({ _id: index }, (err, book) => {
-                    if (err) {
-                        console.log(err);
-                        books.push(book)
-                    }
-                });
-            }
-            return res.json(books.json())
+  app.get('/api/books/closed/tagged/:userid', (req, res) => {
+    User.findById({ _id: req.param.userid }, (err, user) => {
+      if (err) {
+        console.log(err);
+        res.redirect('/');
+      }
+      let books = [];
+      for (index in user.tagged_books) {
+        Book.findById({ _id: index }, (err, book) => {
+          if (err) {
+            console.log(err);
+            books.push(book);
+          }
         });
+      }
+      return res.json(books.json());
     });
-
-
-
-
-}
+  });
+};
