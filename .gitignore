@@ -2,6 +2,9 @@
 # Created by https://www.gitignore.io/api/node,code
 # Edit at https://www.gitignore.io/?templates=node,code
 
+# hidden vars to be replaced with a .env soon
+config.js
+
 ### Code ###
 # Visual Studio Code - https://code.visualstudio.com/
 .settings/

@@ -4,13 +4,15 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "lint":"eslint ."
+    "lint": "eslint ."
   },
   "repository": "https://github.com/calba5141114/customapi.git",
   "license": "MIT",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "body-parser": "^1.18.3",
     "express": "^4.16.4",
+    "jsonwebtoken": "^8.4.0",
     "mongoose": "^5.3.16"
   },
   "devDependencies": {

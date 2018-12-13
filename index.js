@@ -2,11 +2,11 @@ const express = require('express');
 const mongoose = require('mongoose');
 
 const app = express();
-const port = process.env.PORT || 3000;
 const bodyParser = require('body-parser');
 const BookControllers = require('./controllers/BookControllers');
 const UserControllers = require('./controllers/UserControllers');
 const CommentControllers = require('./controllers/CommentController');
+const config = require('./config');
 
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -18,7 +18,7 @@ app.use(bodyParser.json());
  */
 mongoose
   .connect(
-    'mongodb://localhost/bookapidb',
+    config.mongouri,
     { useNewUrlParser: true }
   )
   .then(() => {
@@ -39,6 +39,6 @@ BookControllers(app);
 UserControllers(app);
 CommentControllers(app);
 
-app.listen(port, () => {
-  console.log(`App running on ${port}`);
+app.listen(config.port, () => {
+  console.log(`App running on ${config.port}`);
 });

@@ -1,54 +1,46 @@
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 const User = require('../models/User');
 const Book = require('../models/User');
+const config = require('../config');
 
 module.exports = app => {
-  /**
-   * See all of a users tagged books available to everyone
-   */
-  app.get('/api/books/tagged/:userid', (req, res) => {
-    User.findById({ _id: req.param.userid }, (err, user) => {
+  app.post('/api/user/register', (req, res) => {
+    const hashedPassword = bcrypt.hashSync(req.body.user.password, 8);
+    const usr = new User({
+      username: req.body.user.username,
+      email: req.body.user.email,
+      name: req.body.user.name,
+      password: hashedPassword
+    });
+
+    usr.save((err, user) => {
       if (err) {
         console.log(err);
         return res.redirect('/');
       }
-      let books = [];
-      for (index in user.tagged_books) {
-        Book.findById({ _id: index }, (err, book) => {
-          if (err) {
-            console.log(err);
-          }
-          books.push(book);
-        });
-      }
-      books = books.map(x => {
-        if (x.private == false) {
-          return x;
-        }
+
+      const token = jwt.sign({ id: user._id }, config.secret, {
+        expiresIn: 86400
       });
-      res.json(books.json());
+
+      res.status(200).send({ auth: true, token });
     });
   });
 
-  /**
-   * Limited to owner of the account includes private books
-   */
-
-  app.get('/api/books/closed/tagged/:userid', (req, res) => {
-    User.findById({ _id: req.param.userid }, (err, user) => {
-      if (err) {
-        console.log(err);
-        res.redirect('/');
-      }
-      let books = [];
-      for (index in user.tagged_books) {
-        Book.findById({ _id: index }, (err, book) => {
-          if (err) {
-            console.log(err);
-            books.push(book);
-          }
-        });
-      }
-      return res.json(books.json());
+  app.get('/api/user/me', (req, res) => {
+    const token = req.headers['x-access-token'];
+    if (!token) {
+      return res
+        .status(401)
+        .send({ auth: false, message: 'No token provided.' });
+    }
+    jwt.verify(token, config.secret, (err, decoded) => {
+      if (err)
+        return res
+          .status(500)
+          .send({ auth: false, message: 'Failed to authenticate token.' });
+      res.status(200).send(decoded);
     });
   });
 };
